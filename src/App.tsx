@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { StockChart } from './components/StockChart';
+import { MediaPlayer } from './components/MediaPlayer';
 import { useStockData } from './hooks/useStockData';
 import { ArrowUp, ArrowDown, Activity, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
@@ -114,6 +115,9 @@ export default function App() {
           <div className="w-full h-full p-0">
             <StockChart data={data} color={color} />
           </div>
+
+          {/* Media Player Widget */}
+          <MediaPlayer />
         </div>
       </div>
     </div>
