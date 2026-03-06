@@ -1,13 +1,604 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraWide Stock Ticker</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --panel-bg: rgba(24, 24, 27, 0.8);
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border-color: #27272a;
+        }
 
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            width: 5504px;
+            height: 602px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Background Grid */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 800px;
+            height: 100%;
+            background-color: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-color);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+
+        .header-icon {
+            color: #60a5fa;
+        }
+
+        .ticker-symbol {
+            font-size: 8rem; /* 9xl equiv */
+            font-weight: 700;
+            margin: 0;
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        .ticker-name {
+            font-size: 2.25rem; /* 4xl equiv */
+            color: var(--text-muted);
+            font-weight: 300;
+            margin: 8px 0 0 0;
+        }
+
+        .price-container {
+            margin-top: 20px;
+        }
+
+        .current-price {
+            font-size: 140px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.025em;
+        }
+
+        .currency {
+            font-size: 2.25rem;
+            color: #71717a;
+            font-weight: 500;
+            margin-left: 16px;
+        }
+
+        .change-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 3rem;
+            font-weight: 500;
+            margin-top: 16px;
+        }
+
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: #71717a;
+            font-size: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: monospace;
+            font-size: 2.25rem;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding-top: 32px;
+            display: flex;
+            align-items: center;
+            color: #71717a;
+        }
+
+        .time-display {
+            font-family: monospace;
+            font-size: 1.5rem;
+            margin-left: 16px;
+        }
+
+        .status-indicator {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(to bottom, #000, #18181b);
+            display: flex;
+            flex-direction: column;
+        }
+
+        #stockChart {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Media Player */
+        .media-player {
+            position: absolute;
+            bottom: 32px;
+            right: 32px;
+            width: 400px;
+            height: 225px;
+            background-color: rgba(24, 24, 27, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid #3f3f46;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.5s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+
+        .media-player.expanded {
+            width: 800px;
+            height: 450px;
+        }
+
+        .video-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .media-player:hover .controls-overlay,
+        .media-player:hover .top-controls {
+            opacity: 1;
+        }
+
+        .top-controls {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        .btn-icon {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-play {
+            background: white;
+            color: black;
+            padding: 12px;
+        }
+        .btn-play:hover {
+            background: #f4f4f5;
+            transform: scale(1.05);
+        }
+
+        /* SVG Icons */
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grid-bg"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div>
+            <div class="header-row">
+                <svg class="icon header-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                <span style="font-family: monospace; font-size: 1.5rem; letter-spacing: 0.1em;">LIVE MARKET DATA</span>
+            </div>
+            <h1 class="ticker-symbol" id="symbol">NVDA</h1>
+            <p class="ticker-name" id="name">NVIDIA Corporation</p>
+        </div>
+
+        <div class="price-container">
+            <div style="display: flex; align-items: baseline;">
+                <span class="current-price" id="currentPrice">0.00</span>
+                <span class="currency">USD</span>
+            </div>
+            <div class="change-row" id="changeRow">
+                <svg class="icon" id="arrowIcon" viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                <span id="changeValue">0.00</span>
+                <span id="changePercent" style="opacity: 0.6; font-size: 0.8em;">(0.00%)</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div>
+                <div class="stat-label">Volume</div>
+                <div class="stat-value" id="volume">0</div>
+            </div>
+            <div>
+                <div class="stat-label">Market Cap</div>
+                <div class="stat-value" id="marketCap">2.8T</div>
+            </div>
+            <div>
+                <div class="stat-label">Day High</div>
+                <div class="stat-value" id="dayHigh" style="color: rgba(16, 185, 129, 0.8);">0.00</div>
+            </div>
+            <div>
+                <div class="stat-label">Day Low</div>
+                <div class="stat-value" id="dayLow" style="color: rgba(239, 68, 68, 0.8);">0.00</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span class="time-display" id="clock">00:00:00</span>
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span style="letter-spacing: 0.1em; text-transform: uppercase;">Connected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chart -->
+    <div class="main-content">
+        <canvas id="stockChart"></canvas>
+        
+        <!-- Media Player -->
+        <div class="media-player" id="mediaPlayer">
+            <div class="top-controls">
+                <button class="btn-icon" id="btnExpand">
+                    <svg class="icon" viewBox="0 0 24 24" style="width: 16px; height: 16px;"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                </button>
+            </div>
+            <div class="video-container">
+                <video id="videoElement" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" loop muted playsinline></video>
+                <div class="controls-overlay">
+                    <button class="btn-icon btn-play" id="btnPlay">
+                        <svg class="icon" viewBox="0 0 24 24" style="fill: black; stroke: none;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </button>
+                    <div style="flex: 1; margin: 0 12px;">
+                        <div style="font-size: 12px; color: #d4d4d8; margin-bottom: 4px;">Live Feed</div>
+                        <div style="height: 4px; background: #3f3f46; border-radius: 2px; overflow: hidden;">
+                            <div style="width: 100%; height: 100%; background: #10b981; animation: pulse 2s infinite;"></div>
+                        </div>
+                    </div>
+                    <button class="btn-icon" id="btnMute">
+                        <svg class="icon" id="muteIcon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>
+                    </button>
+                    <label class="btn-icon" style="cursor: pointer;">
+                        <input type="file" id="fileInput" accept="video/*,audio/*" style="display: none;">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const INITIAL_PRICE = 450.00;
+        const VOLATILITY = 0.002;
+        const TREND = 0.0001;
+        const MAX_POINTS = 2000; // Enough for the wide screen
+
+        // --- State ---
+        let price = INITIAL_PRICE;
+        let history = [];
+        let volume = 15000000;
+        let dayHigh = INITIAL_PRICE;
+        let dayLow = INITIAL_PRICE;
+        
+        // --- DOM Elements ---
+        const els = {
+            price: document.getElementById('currentPrice'),
+            change: document.getElementById('changeValue'),
+            percent: document.getElementById('changePercent'),
+            arrow: document.getElementById('arrowIcon'),
+            changeRow: document.getElementById('changeRow'),
+            volume: document.getElementById('volume'),
+            high: document.getElementById('dayHigh'),
+            low: document.getElementById('dayLow'),
+            clock: document.getElementById('clock'),
+            canvas: document.getElementById('stockChart')
+        };
+
+        // --- Chart Setup ---
+        const ctx = els.canvas.getContext('2d');
+        let width, height;
+
+        function resizeCanvas() {
+            // Parent container dimensions
+            const parent = els.canvas.parentElement;
+            width = parent.clientWidth;
+            height = parent.clientHeight;
+            
+            // Set actual canvas size (for high DPI, could multiply by devicePixelRatio)
+            els.canvas.width = width;
+            els.canvas.height = height;
+        }
+        
+        // Initial resize
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- Data Logic ---
+        function initData() {
+            const now = Date.now();
+            let p = INITIAL_PRICE;
+            for (let i = MAX_POINTS; i > 0; i--) {
+                const change = p * (Math.random() * VOLATILITY * 2 - VOLATILITY + TREND);
+                p = Math.max(0.01, p + change);
+                history.push({ time: now - i * 1000, price: p });
+            }
+            price = p;
+            updateStats();
+        }
+
+        function updateData() {
+            const change = price * (Math.random() * VOLATILITY * 2 - VOLATILITY + TREND);
+            price = Math.max(0.01, price + change);
+            
+            history.push({ time: Date.now(), price: price });
+            if (history.length > MAX_POINTS) history.shift();
+            
+            volume += Math.floor(Math.random() * 5000);
+            dayHigh = Math.max(dayHigh, price);
+            dayLow = Math.min(dayLow, price);
+            
+            updateStats();
+            drawChart();
+        }
+
+        function updateStats() {
+            const startPrice = history[0].price;
+            const change = price - startPrice;
+            const percent = (change / startPrice) * 100;
+            const isPos = change >= 0;
+
+            els.price.textContent = price.toFixed(2);
+            els.change.textContent = (isPos ? '+' : '') + change.toFixed(2);
+            els.percent.textContent = `(${percent.toFixed(2)}%)`;
+            
+            els.changeRow.className = `change-row ${isPos ? 'positive' : 'negative'}`;
+            els.arrow.innerHTML = isPos 
+                ? '<line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>' // Up arrow
+                : '<line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>'; // Down arrow
+
+            els.volume.textContent = volume.toLocaleString();
+            els.high.textContent = dayHigh.toFixed(2);
+            els.low.textContent = dayLow.toFixed(2);
+        }
+
+        // --- Drawing Logic ---
+        function drawChart() {
+            if (!history.length) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Determine Y range
+            const prices = history.map(d => d.price);
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = max - min;
+            const padding = range * 0.1;
+            const yMin = min - padding;
+            const yMax = max + padding;
+
+            // Colors
+            const isPos = price >= history[0].price;
+            const color = isPos ? '#10b981' : '#ef4444';
+
+            // Draw Area
+            ctx.beginPath();
+            ctx.moveTo(0, height); // Bottom left
+
+            const stepX = width / (MAX_POINTS - 1);
+            
+            history.forEach((pt, i) => {
+                const x = i * stepX;
+                const normalizedY = (pt.price - yMin) / (yMax - yMin);
+                const y = height - (normalizedY * height);
+                ctx.lineTo(x, y);
+            });
+
+            ctx.lineTo((history.length - 1) * stepX, height); // Bottom right
+            ctx.closePath();
+
+            // Gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, isPos ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Draw Line
+            ctx.beginPath();
+            history.forEach((pt, i) => {
+                const x = i * stepX;
+                const normalizedY = (pt.price - yMin) / (yMax - yMin);
+                const y = height - (normalizedY * height);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+
+        // --- Clock ---
+        function updateClock() {
+            const now = new Date();
+            const pad = (n) => n.toString().padStart(2, '0');
+            els.clock.textContent = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+
+        // --- Media Player Logic ---
+        const video = document.getElementById('videoElement');
+        const btnPlay = document.getElementById('btnPlay');
+        const btnMute = document.getElementById('btnMute');
+        const btnExpand = document.getElementById('btnExpand');
+        const fileInput = document.getElementById('fileInput');
+        const mediaPlayer = document.getElementById('mediaPlayer');
+        const muteIcon = document.getElementById('muteIcon');
+
+        let isPlaying = false;
+
+        btnPlay.addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+                btnPlay.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>'; // Pause icon
+            } else {
+                video.pause();
+                btnPlay.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>'; // Play icon
+            }
+        });
+
+        btnMute.addEventListener('click', () => {
+            video.muted = !video.muted;
+            if (video.muted) {
+                muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            } else {
+                muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+            }
+        });
+
+        btnExpand.addEventListener('click', () => {
+            mediaPlayer.classList.toggle('expanded');
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                video.play();
+                btnPlay.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+            }
+        });
+
+        // --- Initialization ---
+        initData();
+        setInterval(updateData, 1000);
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Auto-play video if possible
+        video.play().then(() => {
+            isPlaying = true;
+            btnPlay.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        }).catch(() => {
+            // Autoplay blocked
+        });
+
+    </script>
+</body>
+</html>
