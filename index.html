@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UltraWide Stock Ticker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #000000;
@@ -17,6 +20,9 @@
 
         * {
             box-sizing: border-box;
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
         }
 
         body {
@@ -24,11 +30,12 @@
             padding: 0;
             background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             width: 5504px;
             height: 602px;
             overflow: hidden;
             display: flex;
+            touch-action: none; /* Prevent touch gestures like zoom */
         }
 
         /* Background Grid */
@@ -60,21 +67,47 @@
             flex-shrink: 0;
         }
 
-        .header-row {
+        .brand-container {
+            margin-bottom: 32px;
+        }
+
+        .brand-logo-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Fallback styling if image is missing */
+        .brand-logo-text {
+            font-family: 'Nunito', sans-serif;
+            font-size: 4rem;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+            letter-spacing: -0.02em;
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-bottom: 16px;
-            opacity: 0.7;
+        }
+        
+        .brand-icon-svg {
+            width: 64px;
+            height: 64px;
         }
 
-        .header-icon {
-            color: #60a5fa;
+        .brand-tagline {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.2rem;
+            color: #d4d4d8;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            margin-left: 4px;
         }
 
         .ticker-symbol {
             font-size: 8rem; /* 9xl equiv */
-            font-weight: 700;
+            font-weight: 900;
             margin: 0;
             line-height: 1;
             letter-spacing: -0.05em;
@@ -93,7 +126,7 @@
 
         .current-price {
             font-size: 140px;
-            font-weight: 700;
+            font-weight: 800;
             line-height: 1;
             letter-spacing: -0.025em;
         }
@@ -101,7 +134,7 @@
         .currency {
             font-size: 2.25rem;
             color: #71717a;
-            font-weight: 500;
+            font-weight: 600;
             margin-left: 16px;
         }
 
@@ -110,7 +143,7 @@
             align-items: center;
             gap: 16px;
             font-size: 3rem;
-            font-weight: 500;
+            font-weight: 700;
             margin-top: 16px;
         }
 
@@ -132,11 +165,13 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 4px;
+            font-weight: 600;
         }
 
         .stat-value {
             font-family: monospace;
             font-size: 2.25rem;
+            font-weight: 600;
         }
 
         .footer {
@@ -187,6 +222,33 @@
             width: 100%;
             height: 100%;
             display: block;
+        }
+        
+        /* Watermark Logo */
+        .watermark {
+            position: absolute;
+            top: 32px;
+            right: 32px;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .watermark img {
+            height: 48px;
+            width: auto;
+        }
+        
+        .watermark-text {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800;
+            font-size: 24px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
 
         /* Media Player */
@@ -299,10 +361,53 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div>
-            <div class="header-row">
-                <svg class="icon header-icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-                <span style="font-family: monospace; font-size: 1.5rem; letter-spacing: 0.1em;">LIVE MARKET DATA</span>
+            <!-- Brand Logo Area -->
+            <div class="brand-container">
+                <!-- 
+                   Replace 'logo.png' with your actual logo file.
+                   If the image fails to load, the text fallback below will be shown.
+                -->
+                <img src="logo.png" alt="BeBright" class="brand-logo-img" onerror="this.style.display='none'; document.getElementById('fallback-logo').style.display='block';">
+                
+                <!-- CSS Fallback Logo -->
+                <div id="fallback-logo" style="display: none;">
+                    <div class="brand-logo-text">
+                        <!-- Butterfly Icon SVG approximation -->
+                        <svg class="brand-icon-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50 50C50 50 30 20 10 30C-10 40 10 70 50 90C90 70 110 40 90 30C70 20 50 50 50 50Z" fill="url(#grad1)"/>
+                            <path d="M50 50C50 50 35 10 15 15C-5 20 10 50 50 50Z" fill="url(#grad2)"/>
+                            <path d="M50 50C50 50 65 10 85 15C105 20 90 50 50 50Z" fill="url(#grad3)"/>
+                            <defs>
+                                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#ff9a9e;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fad0c4;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#a18cd1;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fbc2eb;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#84fab0;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#8fd3f4;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                        BeBright
+                    </div>
+                    <div class="brand-tagline">Brighten the experience</div>
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const img = document.querySelector('.brand-logo-img');
+                        if(img.naturalWidth === 0) {
+                           img.style.display = 'none';
+                           document.getElementById('fallback-logo').style.display = 'block';
+                        }
+                    });
+                </script>
             </div>
+
             <h1 class="ticker-symbol" id="symbol">NVDA</h1>
             <p class="ticker-name" id="name">NVIDIA Corporation</p>
         </div>
@@ -350,6 +455,17 @@
 
     <!-- Main Chart -->
     <div class="main-content">
+        <!-- Watermark -->
+        <div class="watermark">
+             <img src="icon.png" alt="Logo" onerror="this.style.display='none'">
+             <div class="watermark-text">BeBright</div>
+        </div>
+
+        <!-- Multi-Asset Legend -->
+        <div class="chart-legend" id="chartLegend">
+            <!-- Populated by JS -->
+        </div>
+
         <canvas id="stockChart"></canvas>
         
         <!-- Media Player -->
@@ -383,19 +499,77 @@
         </div>
     </div>
 
+    <style>
+        /* Add Legend Styles */
+        .chart-legend {
+            position: absolute;
+            top: 32px;
+            left: 32px;
+            background-color: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            gap: 24px;
+            z-index: 20;
+        }
+
+        .legend-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .legend-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .legend-symbol {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #e4e4e7;
+        }
+
+        .legend-price {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .legend-change {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+    </style>
+
     <script>
         // --- Configuration ---
-        const INITIAL_PRICE = 450.00;
-        const VOLATILITY = 0.002;
-        const TREND = 0.0001;
-        const MAX_POINTS = 2000; // Enough for the wide screen
+        const MAX_POINTS = 2000;
+        
+        // Define multiple assets
+        const ASSETS = [
+            { id: 'NVDA', name: 'NVIDIA', price: 450.00, volatility: 0.002, color: 'dynamic', isPrimary: true },
+            { id: 'BTC', name: 'Bitcoin', price: 64230.50, volatility: 0.003, color: '#f59e0b', isPrimary: false },
+            { id: 'EUR', name: 'EUR/USD', price: 1.0845, volatility: 0.0005, color: '#3b82f6', isPrimary: false },
+            { id: 'GBP', name: 'GBP/USD', price: 1.2630, volatility: 0.0006, color: '#8b5cf6', isPrimary: false }
+        ];
 
         // --- State ---
-        let price = INITIAL_PRICE;
-        let history = [];
+        // Structure: { 'NVDA': [{time, price}, ...], 'BTC': [...] }
+        let marketData = {};
         let volume = 15000000;
-        let dayHigh = INITIAL_PRICE;
-        let dayLow = INITIAL_PRICE;
+        let dayHigh = ASSETS[0].price;
+        let dayLow = ASSETS[0].price;
         
         // --- DOM Elements ---
         const els = {
@@ -408,7 +582,8 @@
             high: document.getElementById('dayHigh'),
             low: document.getElementById('dayLow'),
             clock: document.getElementById('clock'),
-            canvas: document.getElementById('stockChart')
+            canvas: document.getElementById('stockChart'),
+            legend: document.getElementById('chartLegend')
         };
 
         // --- Chart Setup ---
@@ -416,122 +591,247 @@
         let width, height;
 
         function resizeCanvas() {
-            // Parent container dimensions
             const parent = els.canvas.parentElement;
             width = parent.clientWidth;
             height = parent.clientHeight;
-            
-            // Set actual canvas size (for high DPI, could multiply by devicePixelRatio)
             els.canvas.width = width;
             els.canvas.height = height;
         }
         
-        // Initial resize
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
         // --- Data Logic ---
         function initData() {
             const now = Date.now();
-            let p = INITIAL_PRICE;
-            for (let i = MAX_POINTS; i > 0; i--) {
-                const change = p * (Math.random() * VOLATILITY * 2 - VOLATILITY + TREND);
-                p = Math.max(0.01, p + change);
-                history.push({ time: now - i * 1000, price: p });
-            }
-            price = p;
+            
+            // Initialize empty arrays for each asset
+            ASSETS.forEach(asset => {
+                marketData[asset.id] = [];
+                let currentP = asset.price;
+                
+                // Generate history backwards
+                // We generate a temporary array then reverse it to push correctly
+                let tempHistory = [];
+                for (let i = 0; i < MAX_POINTS; i++) {
+                    // Random walk
+                    const change = currentP * (Math.random() * asset.volatility * 2 - asset.volatility + 0.0001);
+                    currentP = Math.max(0.01, currentP - change); // Reverse walk logic roughly
+                    tempHistory.push({ time: now - i * 1000, price: currentP });
+                }
+                // Reverse so index 0 is oldest, index length-1 is newest (now)
+                marketData[asset.id] = tempHistory.reverse();
+                
+                // Reset current price to the "latest" generated point
+                // Actually, let's just set the asset.currentPrice to the last point
+                asset.currentPrice = marketData[asset.id][marketData[asset.id].length - 1].price;
+            });
+            
             updateStats();
+            updateLegend();
         }
 
         function updateData() {
-            const change = price * (Math.random() * VOLATILITY * 2 - VOLATILITY + TREND);
-            price = Math.max(0.01, price + change);
-            
-            history.push({ time: Date.now(), price: price });
-            if (history.length > MAX_POINTS) history.shift();
-            
-            volume += Math.floor(Math.random() * 5000);
-            dayHigh = Math.max(dayHigh, price);
-            dayLow = Math.min(dayLow, price);
+            const now = Date.now();
+
+            ASSETS.forEach(asset => {
+                const lastPrice = marketData[asset.id][marketData[asset.id].length - 1].price;
+                const change = lastPrice * (Math.random() * asset.volatility * 2 - asset.volatility + 0.00005);
+                const newPrice = Math.max(0.01, lastPrice + change);
+                
+                asset.currentPrice = newPrice;
+                marketData[asset.id].push({ time: now, price: newPrice });
+                
+                if (marketData[asset.id].length > MAX_POINTS) {
+                    marketData[asset.id].shift();
+                }
+
+                // Update primary stats if it's the primary asset
+                if (asset.isPrimary) {
+                    volume += Math.floor(Math.random() * 5000);
+                    dayHigh = Math.max(dayHigh, newPrice);
+                    dayLow = Math.min(dayLow, newPrice);
+                }
+            });
             
             updateStats();
+            updateLegend();
             drawChart();
         }
 
         function updateStats() {
+            const primary = ASSETS.find(a => a.isPrimary);
+            const history = marketData[primary.id];
             const startPrice = history[0].price;
-            const change = price - startPrice;
+            const currentPrice = primary.currentPrice;
+            const change = currentPrice - startPrice;
             const percent = (change / startPrice) * 100;
             const isPos = change >= 0;
 
-            els.price.textContent = price.toFixed(2);
+            els.price.textContent = currentPrice.toFixed(2);
             els.change.textContent = (isPos ? '+' : '') + change.toFixed(2);
             els.percent.textContent = `(${percent.toFixed(2)}%)`;
             
             els.changeRow.className = `change-row ${isPos ? 'positive' : 'negative'}`;
             els.arrow.innerHTML = isPos 
-                ? '<line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>' // Up arrow
-                : '<line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>'; // Down arrow
+                ? '<line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>' 
+                : '<line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>';
 
             els.volume.textContent = volume.toLocaleString();
             els.high.textContent = dayHigh.toFixed(2);
             els.low.textContent = dayLow.toFixed(2);
         }
 
+        function updateLegend() {
+            // Re-render legend items
+            // We only do this efficiently by updating text if exists, or creating if not
+            // For simplicity in vanilla JS, we'll clear and rebuild or just update values
+            
+            if (els.legend.children.length === 0) {
+                // Initial build
+                ASSETS.forEach(asset => {
+                    if (asset.isPrimary) return; // Skip primary in legend (it's on sidebar)
+                    
+                    const div = document.createElement('div');
+                    div.className = 'legend-item';
+                    div.id = `legend-${asset.id}`;
+                    div.innerHTML = `
+                        <div class="legend-header">
+                            <div class="legend-dot" style="background-color: ${asset.color}"></div>
+                            <span class="legend-symbol">${asset.id}</span>
+                        </div>
+                        <div class="legend-price">0.00</div>
+                        <div class="legend-change">0.00%</div>
+                    `;
+                    els.legend.appendChild(div);
+                });
+            }
+
+            // Update values
+            ASSETS.forEach(asset => {
+                if (asset.isPrimary) return;
+                
+                const el = document.getElementById(`legend-${asset.id}`);
+                if (el) {
+                    const history = marketData[asset.id];
+                    const start = history[0].price;
+                    const current = asset.currentPrice;
+                    const changePct = ((current - start) / start) * 100;
+                    const isPos = changePct >= 0;
+                    
+                    el.querySelector('.legend-price').textContent = current.toFixed(asset.id.includes('USD') && !asset.id.includes('BTC') ? 4 : 2);
+                    const changeEl = el.querySelector('.legend-change');
+                    changeEl.textContent = (isPos ? '+' : '') + changePct.toFixed(2) + '%';
+                    changeEl.style.color = isPos ? '#10b981' : '#ef4444';
+                }
+            });
+        }
+
         // --- Drawing Logic ---
         function drawChart() {
-            if (!history.length) return;
-
+            // We need to normalize all charts to Percentage Change relative to their own start point
+            // This allows them to share the same Y-axis scale
+            
             ctx.clearRect(0, 0, width, height);
 
-            // Determine Y range
-            const prices = history.map(d => d.price);
-            const min = Math.min(...prices);
-            const max = Math.max(...prices);
-            const range = max - min;
-            const padding = range * 0.1;
-            const yMin = min - padding;
-            const yMax = max + padding;
+            // 1. Calculate % change history for all assets
+            // And find the global min/max % change to scale the graph
+            let minPct = 0;
+            let maxPct = 0;
 
-            // Colors
-            const isPos = price >= history[0].price;
-            const color = isPos ? '#10b981' : '#ef4444';
+            const normalizedData = {}; // { 'NVDA': [0, 0.1, -0.2, ...], ... }
 
-            // Draw Area
-            ctx.beginPath();
-            ctx.moveTo(0, height); // Bottom left
-
-            const stepX = width / (MAX_POINTS - 1);
-            
-            history.forEach((pt, i) => {
-                const x = i * stepX;
-                const normalizedY = (pt.price - yMin) / (yMax - yMin);
-                const y = height - (normalizedY * height);
-                ctx.lineTo(x, y);
+            ASSETS.forEach(asset => {
+                const history = marketData[asset.id];
+                const startPrice = history[0].price;
+                const pctHistory = history.map(pt => (pt.price - startPrice) / startPrice);
+                
+                normalizedData[asset.id] = pctHistory;
+                
+                const localMin = Math.min(...pctHistory);
+                const localMax = Math.max(...pctHistory);
+                minPct = Math.min(minPct, localMin);
+                maxPct = Math.max(maxPct, localMax);
             });
 
-            ctx.lineTo((history.length - 1) * stepX, height); // Bottom right
+            // Add padding
+            const range = maxPct - minPct;
+            const padding = range * 0.1 || 0.01; // Default padding if flat
+            const yMin = minPct - padding;
+            const yMax = maxPct + padding;
+            const yRange = yMax - yMin;
+
+            // Helper to map index/value to x/y
+            const stepX = width / (MAX_POINTS - 1);
+            const getY = (pct) => height - ((pct - yMin) / yRange) * height;
+
+            // 2. Draw Zero Line
+            const zeroY = getY(0);
+            ctx.beginPath();
+            ctx.moveTo(0, zeroY);
+            ctx.lineTo(width, zeroY);
+            ctx.strokeStyle = '#3f3f46';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 3. Draw Secondary Assets first (so Primary is on top)
+            ASSETS.forEach(asset => {
+                if (asset.isPrimary) return;
+                
+                const data = normalizedData[asset.id];
+                ctx.beginPath();
+                data.forEach((pct, i) => {
+                    const x = i * stepX;
+                    const y = getY(pct);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.strokeStyle = asset.color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+
+            // 4. Draw Primary Asset (Filled Area)
+            const primary = ASSETS.find(a => a.isPrimary);
+            const pData = normalizedData[primary.id];
+            const isPos = pData[pData.length - 1] >= 0;
+            const pColor = isPos ? '#10b981' : '#ef4444';
+
+            // Area
+            ctx.beginPath();
+            ctx.moveTo(0, height); // Bottom left (technically should be zeroY if we want fill to zero, but fill to bottom looks better for "Area")
+            // Actually, let's fill to bottom for the "Area" look
+            
+            pData.forEach((pct, i) => {
+                const x = i * stepX;
+                const y = getY(pct);
+                ctx.lineTo(x, y);
+            });
+            ctx.lineTo((pData.length - 1) * stepX, height);
             ctx.closePath();
 
-            // Gradient fill
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, isPos ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)');
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Draw Line
+            // Line
             ctx.beginPath();
-            history.forEach((pt, i) => {
+            pData.forEach((pct, i) => {
                 const x = i * stepX;
-                const normalizedY = (pt.price - yMin) / (yMax - yMin);
-                const y = height - (normalizedY * height);
+                const y = getY(pct);
                 if (i === 0) ctx.moveTo(x, y);
                 else ctx.lineTo(x, y);
             });
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 3;
+            ctx.strokeStyle = pColor;
+            ctx.lineWidth = 4;
+            ctx.shadowColor = pColor;
+            ctx.shadowBlur = 10;
             ctx.stroke();
+            ctx.shadowBlur = 0;
         }
 
         // --- Clock ---
