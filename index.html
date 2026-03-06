@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
+            --w: 5504px;
+            --h: 602px;
             --bg-color: #000000;
             --panel-bg: rgba(24, 24, 27, 0.8);
             --text-main: #ffffff;
@@ -44,8 +46,8 @@
         }
 
         #app-container {
-            width: 5504px;
-            height: 602px;
+            width: var(--w);
+            height: var(--h);
             background-color: var(--bg-color);
             position: relative;
             display: flex;
@@ -574,8 +576,9 @@
             const container = document.getElementById('app-container');
             if (!container) return;
             
-            const targetWidth = 5504;
-            const targetHeight = 602;
+            const rootStyle = getComputedStyle(document.documentElement);
+            const targetWidth = parseInt(rootStyle.getPropertyValue('--w'));
+            const targetHeight = parseInt(rootStyle.getPropertyValue('--h'));
             
             const windowWidth = window.innerWidth;
             const windowHeight = window.innerHeight;
