@@ -900,26 +900,10 @@
         function initData() {
             const now = Date.now();
             
-            // Initialize empty arrays for each asset
+            // Initialize with a single point for each asset
             ASSETS.forEach(asset => {
-                marketData[asset.id] = [];
-                let currentP = asset.price;
-                
-                // Generate history backwards
-                // We generate a temporary array then reverse it to push correctly
-                let tempHistory = [];
-                for (let i = 0; i < MAX_POINTS; i++) {
-                    // Random walk
-                    const change = currentP * (Math.random() * asset.volatility * 2 - asset.volatility + 0.0001);
-                    currentP = Math.max(0.01, currentP - change); // Reverse walk logic roughly
-                    tempHistory.push({ time: now - i * 1000, price: currentP });
-                }
-                // Reverse so index 0 is oldest, index length-1 is newest (now)
-                marketData[asset.id] = tempHistory.reverse();
-                
-                // Reset current price to the "latest" generated point
-                // Actually, let's just set the asset.currentPrice to the last point
-                asset.currentPrice = marketData[asset.id][marketData[asset.id].length - 1].price;
+                marketData[asset.id] = [{ time: now, price: asset.price }];
+                asset.currentPrice = asset.price;
             });
             
             updateStats();
