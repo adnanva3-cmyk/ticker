@@ -230,8 +230,8 @@
         .main-content {
             position: absolute;
             top: 0;
-            left: 800px;
-            width: calc(100% - 800px);
+            left: 0;
+            width: 100%;
             height: 100%;
             background: linear-gradient(to bottom, #000, #18181b);
             display: flex;
@@ -444,6 +444,34 @@
                 <span id="changePercent" style="opacity: 0.6; font-size: 0.8em;">(0.00%)</span>
             </div>
         </div>
+
+        <div class="stats-grid">
+            <div>
+                <div class="stat-label">Volume</div>
+                <div class="stat-value" id="volume">0</div>
+            </div>
+            <div>
+                <div class="stat-label">Market Cap</div>
+                <div class="stat-value" id="marketCap">2.8T</div>
+            </div>
+            <div>
+                <div class="stat-label">Day High</div>
+                <div class="stat-value" id="dayHigh" style="color: rgba(16, 185, 129, 0.8);">0.00</div>
+            </div>
+            <div>
+                <div class="stat-label">Day Low</div>
+                <div class="stat-value" id="dayLow" style="color: rgba(239, 68, 68, 0.8);">0.00</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span class="time-display" id="clock">00:00:00</span>
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span style="letter-spacing: 0.1em; text-transform: uppercase;">Connected</span>
+            </div>
+        </div>
     </div>
 
     <!-- Main Chart -->
@@ -460,23 +488,6 @@
         </div>
 
         <canvas id="stockChart"></canvas>
-        
-        <!-- Market Wall Overlay -->
-        <div class="market-wall-overlay">
-            <div class="widgets-zone">
-                <div class="widgets-track" id="widgetsTrack">
-                    <div class="widgets-set" id="widgetsSetA"></div>
-                    <div class="widgets-set" id="widgetsSetB"></div>
-                </div>
-            </div>
-
-            <div class="news-zone">
-                <div class="news-track" id="newsTrack">
-                    <div class="news-set" id="newsSetA"></div>
-                    <div class="news-set" id="newsSetB"></div>
-                </div>
-            </div>
-        </div>
         
         <!-- Media Player -->
         <div class="media-player" id="mediaPlayer">
@@ -561,143 +572,6 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
-
-        /* ===== MARKET WALL OVERLAY ===== */
-        .market-wall-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5; /* Above canvas (z=0), below sidebar (z=10) */
-            display: flex;
-            flex-direction: column;
-            pointer-events: none; /* Let clicks pass through to canvas/video if needed */
-        }
-
-        /* Allow pointer events on widgets if they are interactive */
-        .widgets-zone, .news-zone {
-            pointer-events: auto;
-        }
-
-        :root {
-            /* Market Wall Variables */
-            --newsH: 200px;
-            --topH: calc(var(--h) - var(--newsH));
-            --tileW: 420px;
-            --tileGap: 18px;
-            --newsFont: 48px;
-            --newsSpace: 30px;
-            
-            /* animated via JS */
-            --widgetsScroll: 2000px;
-            --widgetsDuration: 120s;
-            --newsScroll: 2000px;
-            --newsDuration: 90s;
-        }
-
-        /* ===== WIDGETS ===== */
-        .widgets-zone {
-            height: var(--topH);
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .widgets-track {
-            display: flex;
-            gap: var(--tileGap);
-            height: 100%;
-            animation: widgetsScroll var(--widgetsDuration) linear infinite;
-            will-change: transform;
-        }
-
-        .widgets-set {
-            display: flex;
-            gap: var(--tileGap);
-            height: 100%;
-        }
-
-        .tile {
-            width: var(--tileW);
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            /* Ensure tiles have background or are transparent as desired */
-            /* background: rgba(0,0,0,0.5); */ 
-        }
-
-        .tile-title {
-            color: #fff;
-            font-size: 30px;
-            font-weight: 800;
-            padding: 14px 6px 6px;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .tile-widget {
-            flex: 1;
-            padding: 0 6px 10px;
-            box-sizing: border-box;
-        }
-
-        .tile-widget iframe,
-        .tile-widget div {
-            width: 100%!important;
-            height: 100%!important;
-            border: 0!important;
-            display: block;
-        }
-
-        @keyframes widgetsScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(-1 * var(--widgetsScroll))); }
-        }
-
-        /* ===== NEWS ===== */
-        .news-zone {
-            height: var(--newsH);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            border-top: 1px solid rgba(255,255,255,.15);
-            background: rgba(0,0,0,0.6); /* Semi-transparent background for readability */
-            backdrop-filter: blur(8px);
-        }
-
-        .news-track {
-            display: flex;
-            animation: newsScroll var(--newsDuration) linear infinite;
-            will-change: transform;
-        }
-
-        .news-set {
-            display: flex;
-            align-items: center;
-        }
-
-        .news-item {
-            color: #fff;
-            font-size: var(--newsFont);
-            font-weight: 700;
-            white-space: nowrap;
-            letter-spacing: .5px;
-            padding: 0 var(--newsSpace);
-        }
-
-        .news-sep {
-            color: rgba(255,255,255,.45);
-            font-size: var(--newsFont);
-            padding: 0 var(--newsSpace);
-        }
-
-        @keyframes newsScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(-1 * var(--newsScroll))); }
-        }
     </style>
 
     <script>
@@ -727,133 +601,6 @@
         // Call immediately
         scaleApp();
 
-        // --- MARKET WALL LOGIC ---
-        /* ===== MARKET DATA ===== */
-        const widgetItems = [
-            {title:"🟡 GOLD XAU / USD", symbol:"OANDA:XAUUSD"},
-            {title:"⚪ SILVER XAG / USD", symbol:"OANDA:XAGUSD"},
-            {title:"BTC / USD",         symbol:"BITSTAMP:BTCUSD"},
-            {title:"AED / PKR",         symbol:"FX_IDC:AEDPKR"},
-            {title:"AED / INR",         symbol:"FX_IDC:AEDINR"},
-            {title:"AED / LKR",         symbol:"FX_IDC:AEDLKR"},
-            {title:"GBP / AED",         symbol:"FX_IDC:GBPAED"},
-            {title:"AED / RUB",         symbol:"FX_IDC:AEDRUB"}
-        ];
-
-        function createWidget(item){
-            const tile = document.createElement("div");
-            tile.className = "tile";
-
-            tile.innerHTML = `
-                <div class="tile-title">${item.title}</div>
-                <div class="tile-widget tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                </div>
-            `;
-
-            const script = document.createElement("script");
-            script.src   = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
-            script.async = true;
-
-            // ✅ timezone added
-            script.innerHTML = JSON.stringify({
-                symbol: item.symbol,
-                width: "100%",
-                height:"100%",
-                locale:"en",
-                dateRange:"1D",
-                colorTheme:"dark",
-                isTransparent:true,
-                timezone:"Asia/Dubai"
-            });
-
-            tile.querySelector(".tile-widget").appendChild(script);
-            return tile;
-        }
-
-        /* ===== NEWS DATA (INLINE) ===== */
-        const newsItems = [
-            "UAE markets: investors watch regional FX demand and remittance flows",
-            "Gold holds near key levels as traders weigh inflation expectations",
-            "Bitcoin volatility remains elevated amid macro headlines",
-            "GBP/AED traders monitor UK rate expectations",
-            "South Asia FX reacts to import costs and policy signals",
-            "MENA markets track global yields and energy headlines"
-        ];
-
-        function createNews(text){
-            const el = document.createElement("div");
-            el.className = "news-item";
-            el.textContent = text;
-            return el;
-        }
-        function createSep(){
-            const el = document.createElement("div");
-            el.className = "news-sep";
-            el.textContent = "|";
-            return el;
-        }
-
-        /* ===== RENDER + SEAMLESS LOOP ===== */
-        function setupWidgets(){
-            const track = document.getElementById("widgetsTrack");
-            const setA  = document.getElementById("widgetsSetA");
-            const setB  = document.getElementById("widgetsSetB");
-            
-            if (!track || !setA || !setB) return;
-
-            setA.innerHTML = "";
-            setB.innerHTML = "";
-
-            widgetItems.forEach(w => setA.appendChild(createWidget(w)));
-            widgetItems.forEach(w => setB.appendChild(createWidget(w)));
-
-            requestAnimationFrame(() => {
-                const dist = setA.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).gap) || 0);
-                document.documentElement.style.setProperty("--widgetsScroll", dist + "px");
-
-                const speed = 90; // px/sec
-                document.documentElement.style.setProperty("--widgetsDuration", (dist/speed) + "s");
-            });
-        }
-
-        function buildNewsSet(container){
-            newsItems.forEach((n,i) => {
-                container.appendChild(createNews(n));
-                if (i !== newsItems.length - 1) container.appendChild(createSep());
-            });
-        }
-
-        function setupNews(){
-            const setA = document.getElementById("newsSetA");
-            const setB = document.getElementById("newsSetB");
-            
-            if (!setA || !setB) return;
-
-            setA.innerHTML = "";
-            setB.innerHTML = "";
-
-            buildNewsSet(setA);
-            buildNewsSet(setB);
-
-            requestAnimationFrame(() => {
-                const dist = setA.getBoundingClientRect().width;
-                document.documentElement.style.setProperty("--newsScroll", dist + "px");
-
-                const speed = 140; // px/sec
-                document.documentElement.style.setProperty("--newsDuration", (dist/speed) + "s");
-            });
-        }
-
-        window.addEventListener("load", () => {
-            setupWidgets();
-            setupNews();
-        });
-        window.addEventListener("resize", () => {
-            setupWidgets();
-            setupNews();
-        });
-
         // --- Configuration ---
         const MAX_POINTS = 2000;
         
@@ -868,6 +615,9 @@
         // --- State ---
         // Structure: { 'NVDA': [{time, price}, ...], 'BTC': [...] }
         let marketData = {};
+        let volume = 15000000;
+        let dayHigh = ASSETS[0].price;
+        let dayLow = ASSETS[0].price;
         
         // --- DOM Elements ---
         const els = {
@@ -876,6 +626,10 @@
             percent: document.getElementById('changePercent'),
             arrow: document.getElementById('arrowIcon'),
             changeRow: document.getElementById('changeRow'),
+            volume: document.getElementById('volume'),
+            high: document.getElementById('dayHigh'),
+            low: document.getElementById('dayLow'),
+            clock: document.getElementById('clock'),
             canvas: document.getElementById('stockChart'),
             legend: document.getElementById('chartLegend')
         };
@@ -900,10 +654,26 @@
         function initData() {
             const now = Date.now();
             
-            // Initialize with a single point for each asset
+            // Initialize empty arrays for each asset
             ASSETS.forEach(asset => {
-                marketData[asset.id] = [{ time: now, price: asset.price }];
-                asset.currentPrice = asset.price;
+                marketData[asset.id] = [];
+                let currentP = asset.price;
+                
+                // Generate history backwards
+                // We generate a temporary array then reverse it to push correctly
+                let tempHistory = [];
+                for (let i = 0; i < MAX_POINTS; i++) {
+                    // Random walk
+                    const change = currentP * (Math.random() * asset.volatility * 2 - asset.volatility + 0.0001);
+                    currentP = Math.max(0.01, currentP - change); // Reverse walk logic roughly
+                    tempHistory.push({ time: now - i * 1000, price: currentP });
+                }
+                // Reverse so index 0 is oldest, index length-1 is newest (now)
+                marketData[asset.id] = tempHistory.reverse();
+                
+                // Reset current price to the "latest" generated point
+                // Actually, let's just set the asset.currentPrice to the last point
+                asset.currentPrice = marketData[asset.id][marketData[asset.id].length - 1].price;
             });
             
             updateStats();
@@ -923,6 +693,13 @@
                 
                 if (marketData[asset.id].length > MAX_POINTS) {
                     marketData[asset.id].shift();
+                }
+
+                // Update primary stats if it's the primary asset
+                if (asset.isPrimary) {
+                    volume += Math.floor(Math.random() * 5000);
+                    dayHigh = Math.max(dayHigh, newPrice);
+                    dayLow = Math.min(dayLow, newPrice);
                 }
             });
             
@@ -948,6 +725,10 @@
             els.arrow.innerHTML = isPos 
                 ? '<line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>' 
                 : '<line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>';
+
+            els.volume.textContent = volume.toLocaleString();
+            els.high.textContent = dayHigh.toFixed(2);
+            els.low.textContent = dayLow.toFixed(2);
         }
 
         function updateLegend() {
@@ -1102,6 +883,13 @@
             ctx.shadowBlur = 0;
         }
 
+        // --- Clock ---
+        function updateClock() {
+            const now = new Date();
+            const pad = (n) => n.toString().padStart(2, '0');
+            els.clock.textContent = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        }
+
         // --- Media Player Logic ---
         const video = document.getElementById('videoElement');
         const btnPlay = document.getElementById('btnPlay');
@@ -1149,6 +937,8 @@
         // --- Initialization ---
         initData();
         setInterval(updateData, 1000);
+        setInterval(updateClock, 1000);
+        updateClock();
 
         // Auto-play video if possible
         video.play().then(() => {
